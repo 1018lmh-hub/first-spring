@@ -78,7 +78,7 @@
 	                	<!-- 로그인 후 -->
 	               
 	                    <label>${ userInfo.userName }님 환영합니다</label> &nbsp;&nbsp;
-	                    <a href="">마이페이지</a>
+	                    <a href="mypage">마이페이지</a>
 	                    <a href="logout">로그아웃</a>
 	                </c:otherwise>
                 </c:choose>
@@ -86,9 +86,9 @@
         </div>
         <div id="header_2">
             <ul>
-                <li><a href="">HOME</a></li>
+                <li><a href="http://localhost:8088/spring/">HOME</a></li>
                 <li><a href="">공지사항</a></li>
-                <li><a href="">자유게시판</a></li>
+                <li><a href="http://localhost:8088/spring/boards">자유게시판</a></li>
                 <li><a href="">사진게시판</a></li>
             </ul>
         </div>

@@ -1,7 +1,10 @@
 package com.kh.spring.member.model.service;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Service;
 
+import com.kh.spring.exception.AuthorizationException;
 import com.kh.spring.exception.InvalidParameterException;
 import com.kh.spring.exception.TooLargeValueException;
 import com.kh.spring.member.model.dao.MemberMapper;
@@ -97,7 +100,7 @@ public class MemberServiceImpl {
 		//log.info("사용자가 입력한 비밀번호 평문 : {}", member.getUserPwd());
 		//log.info("DB에 저장된 암호화된 비밀번호 : {}", userInfo.getUserPwd());
 		
-		if(passwordEncoder.matches(member.getUserPwd(), userInfo.getUserPwd())) {
+		if(passwordEncoder.matches(userPwd, userInfo.getUserPwd())) {
 			return userInfo;
 		}
 		
@@ -164,15 +167,126 @@ public class MemberServiceImpl {
 	}
 	
 	private void checkBlank(MemberDto member) {
-		if(member.getUserId() == null ||
-				   member.getUserId().trim().isEmpty()||
-				   member.getUserName() == null ||
-				   member.getUserName().trim().isEmpty()|| 
-				   member.getUserPwd() == null ||
-				   member.getUserPwd().trim().isEmpty()) {
-					throw new InvalidParameterException("유효하지 않은 값입니다.");
-				}
+		checkUserId(member);
+		checkUserPwd(member);
+		checkUserName(member);
 	}
 	
+	private void checkUserId(MemberDto member) {
+		if(member.getUserId() == null ||
+		   member.getUserId().trim().isEmpty()) {
+			throw new InvalidParameterException("유효하지 않은 아이디입니다.");
+		}
+		
+	}
+	private void checkUserPwd(MemberDto member) {
+		if(member.getUserPwd() == null ||
+		   member.getUserPwd().trim().isEmpty()) {
+			throw new InvalidParameterException("유효하지 않은 비밀번호입니다.");
+		}
+			
+		}
+	private void checkUserName(MemberDto member) {
+		if(member.getUserName() == null ||
+		   member.getUserName().trim().isEmpty()) {
+			throw new InvalidParameterException("유효하지 않은 이름입니다.");
+		}
+	}
 	
+	private void checkNull(MemberDto member) {
+		if(member == null) {
+			throw new NullPointerException("잘못된 접근입니다.");
+		}
+	}
+	
+	private void validateUpdateMember(MemberDto member, MemberDto sessionMember) {
+		checkNull(member);
+		checkNull(sessionMember);
+		checkUserName(member);
+		checkUserId(member);
+		
+		if(!member.getUserId().equals(sessionMember.getUserId())) {
+			throw new AuthorizationException("권한없는 접근입니다.");
+		}
+		
+		checkNull(memberMapper.login(member));
+	}
+	
+	public void update(MemberDto member, HttpSession session) {
+		
+		//memberMapper.update(member);
+		MemberDto sessionMember = ((MemberDto)session.getAttribute("userInfo"));
+		//앞단에서 넘어온 ID값 member.userId
+		//로그인된 사용자의 ID값 sessionMember.userId
+		
+		//앞단에서 넘어온 ID값과 현재 로그인된 사용자의 ID값이 일치하는가?
+		//실제 DB에 ID값이 존재하는 회원인가?
+		//USERNAME컬럼에 넣을 값이 USERNAME컬럼 크기보다 크지 않은가?
+		//EMAIL컬럼에 넣을 값이 EMAIL컬럼 크기보다 크지 않은가?
+		//USERNAME컬럼에 전달된 값이 빈문자열이 아닌가?
+		validateUpdateMember(member, sessionMember);
+		
+		//DB가서 UPDATE
+		int result = memberMapper.update(member);
+		
+		//업데이트가 성공적으로 수행되었는가?
+		if(result != 1) {
+			throw new AuthorizationException("문제가 발생했습니다. 관리자에게 문의하세요.");
+			
+		}
+		
+		//수정된 정보를 DB에서 SELECT => sessionScope에 존재하는 userInfo키값에 MemberDTO객체 필드값을 갱신해주기
+		sessionMember.setUserName(member.getUserName());
+		sessionMember.setEmail(member.getEmail());
+		
+		
+	}
+	
+	public void delete(String userId, String userPwd, HttpSession session) {
+		MemberDto sessionMember = ((MemberDto)session.getAttribute("userInfo"));
+		
+		checkNull(sessionMember);
+		
+		if(!userId.equals(sessionMember.getUserId())) {
+			throw new AuthorizationException("잘못된 요청이에요");	
+		}
+		
+		String encPassword = memberMapper.login(sessionMember).getUserPwd();
+		
+		if(!passwordEncoder.matches(userPwd, encPassword)) {
+			throw new AuthorizationException("비밀번호가 일치하지 않습니다.");
+		}
+		
+		int result = memberMapper.delete(userId);
+		
+		if(result != 1) {
+			throw new AuthorizationException("관리자에게 문의하세요.");
+			
+		}
+		
+		session.removeAttribute("userInfo");
+		
+		
+	}
+	
+	/*
+	 * 쉬운데 어려움(복잡함)
+	 * 
+	 * DynamicWebProject => Spring으로바꾸기
+	 * 
+	 * 세팅 수업시간에 한 거 그대로 써도 ㄱㅊ
+	 * 
+	 * DynamicWebProject 회원(WEB_MEMBER)파트 => Spring버전으로 다시 구현하기
+	 * 
+	 * 화면 다 있고 테이블 다 있고 SQL문 다 있고
+	 * 
+	 * 
+	 * 
+	 */
+	
+	public String checkId(String id) {
+		return memberMapper.checkId(id);
+	}
+		
 }
+
