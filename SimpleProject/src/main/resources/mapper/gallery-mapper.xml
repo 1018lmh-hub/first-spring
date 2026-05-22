@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.kh.spring.gallery.model.dao.GalleryMapper"></mapper>
+
+ 	<select id="selectTotalCount">
+ 	SELECT
+ 	       COUNT(*)
+ 	  FROM
+ 	       GALLERY
+ 	 WHERE
+ 	       STATUS ='Y'
+ 	</select>
+ 	
+ 	<sql id="galleryColumn">
+ 		SELECT
+ 		       GALLERY_NO
+ 		     , GALLERY_TITLE
+ 		     , GALLERY_WRITER
+ 		     , COUNT
+ 		     , TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') as createDate
+ 		     , CHANGE_NAME
+ 	</sql>
+ 	
+ 	<select id="findAll"
+ 			resultType="com.kh.spring.gallery.model.dto.GalleryDto">
+		<include refid="galleryColumn"/>
+		  FROM
+ 		       GALLERY
+		  LEFT
+ 		  JOIN
+ 		       GAL_FILE USING (GALLERY_NO)
+ 		 WHERE
+ 		       STATUS='Y'
+ 		 ORDER
+ 		    BY
+ 		       GALLERY_NO DESC;
+   
+ 	
+ 	</select>

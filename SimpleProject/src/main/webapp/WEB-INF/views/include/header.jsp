@@ -89,7 +89,7 @@
                 <li><a href="http://localhost:8088/spring/">HOME</a></li>
                 <li><a href="">공지사항</a></li>
                 <li><a href="http://localhost:8088/spring/boards">자유게시판</a></li>
-                <li><a href="">사진게시판</a></li>
+                <li><a href="http://localhost:8088/spring/galleries">사진게시판</a></li>
             </ul>
         </div>
     </div>
