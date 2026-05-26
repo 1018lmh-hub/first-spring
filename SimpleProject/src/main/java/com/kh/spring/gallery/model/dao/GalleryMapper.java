@@ -7,7 +7,7 @@ import org.apache.ibatis.session.RowBounds;
 
 import com.kh.spring.gallery.model.dto.GalleryDto;
 
-@Mapper
+//@Mapper
 public class GalleryMapper {
 
 	public int selectTotalCount() {

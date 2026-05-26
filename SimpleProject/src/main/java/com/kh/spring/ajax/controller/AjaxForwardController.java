@@ -24,5 +24,10 @@ public class AjaxForwardController {
 		mv.addObject("count", count).setViewName("ajax/ajax");
 		return mv;
 	}
+	
+	@GetMapping("blog")
+	public String toBlog() {
+		return "api/blog";
+	}
 
 }

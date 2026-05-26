@@ -18,13 +18,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
+//@Service
 @RequiredArgsConstructor
 public class GalleryService {
 	
 	private final GalleryMapper galleryMapper;
 	private final Pagenation pagenation;
-	private final FileUpload fileUpload;
+//	private final FileUpload fileUpload;
 	
 
 	@Transactional(readOnly = true)
@@ -40,7 +40,7 @@ public class GalleryService {
 		
 		PageInfo pi = pagenation.getPageInfo(totalCount, page, 5, 3);
 		
-		RowBounds rb = new RowBounds((page - 1) * 5 , 5); // 실제로 페이징 처리 시에는 SQL문에서 해결(OFFSET문법)하는 것을 권장
+		RowBounds rb = new RowBounds((page - 1) * 5 , 5);
 		List<GalleryDto> galleries = galleryMapper.findAll(rb);
 		
 		
